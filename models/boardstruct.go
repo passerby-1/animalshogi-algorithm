@@ -1,11 +1,8 @@
 package models
 
-type board struct {
-	Squares []Square
-}
-
-type Square struct {
+type Board struct {
 	Coordinate XY     // 座標
+	Player     int    // プレイヤーの番号
 	Type       string // コマの種類
 }
 

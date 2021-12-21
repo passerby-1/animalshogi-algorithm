@@ -45,27 +45,17 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 
 	time.Sleep(time.Second * 1)
 
+	// var org_json string = `{"B1":"l2","C1":"e2","B2":"g2","C3":"g1","B4":"l1","C4":"e1","D1":"c1","E1":"c2"}`
+
 	for {
-		// counter := 0
+
+		// UnmarshaledJson, _ = tools.UnmarshalJSON([]byte(org_json))
 
 		socket.Send(s, "turn")
 		message, _ = socket.Recieve(s)
 		current_turn, _ := tools.Player_num(message)
 		fmt.Printf("recieved msg: %v", message)
 		fmt.Printf("Current turn: %v\n", current_turn)
-
-		/*
-			if tools.Ismyturn(current_turn, player) {
-				fmt.Printf("My turn!")
-				sendmsg := "mv " + move[counter]
-				socket.Send(s, sendmsg)
-				counter++
-
-				if counter == 1 {
-					break
-				}
-			}
-		*/
 
 		time.Sleep(time.Second * 1)
 	}
