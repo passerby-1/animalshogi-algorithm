@@ -7,10 +7,10 @@ import (
 
 func TestMasuToXY(t *testing.T) {
 
-	result := MasuToXY("A1")
+	result := MasuToXY("C1")
 
 	var correctResult models.XY
-	correctResult.X = 0
+	correctResult.X = 2
 	correctResult.Y = 0
 
 	if result != correctResult {

@@ -41,8 +41,11 @@ func Ismyturn(turn int, player int) bool {
 
 func MasuToXY(masu string) models.XY {
 	var result models.XY
+	masubytes := []byte(masu)
 
-	switch masu[0:1] {
+	// fmt.Printf("\nmasubytes[0]:%v, masubytes[1]:%v\n", string(masubytes[0]), string(masubytes[1]))
+
+	switch string(masubytes[0]) {
 	case "A":
 		result.X = 0
 	case "B":
@@ -57,23 +60,23 @@ func MasuToXY(masu string) models.XY {
 		result.X = -1
 	}
 
-	switch masu[1:2] {
+	switch string(masubytes[1]) {
 	case "1":
-		result.X = 0
+		result.Y = 0
 	case "2":
-		result.X = 1
+		result.Y = 1
 	case "3":
-		result.X = 2
+		result.Y = 2
 	case "4":
-		result.X = 3
+		result.Y = 3
 	case "5":
-		result.X = 4
+		result.Y = 4
 	case "6":
-		result.X = 5
+		result.Y = 5
 	default:
-		result.X = -1
+		result.Y = -1
 	}
-
+	// fmt.Printf("Result:%v\n", result)
 	return result
 
 }
