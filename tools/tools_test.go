@@ -19,3 +19,18 @@ func TestMasuToXY(t *testing.T) {
 
 	t.Logf("Success")
 }
+
+func TestXYToMasu(t *testing.T) {
+
+	var challenge models.XY
+	challenge.X = 0
+	challenge.Y = 0
+
+	result := XYToMasu(challenge)
+
+	if result != "A1" {
+		t.Errorf("Error")
+	}
+
+	t.Logf("Success")
+}
