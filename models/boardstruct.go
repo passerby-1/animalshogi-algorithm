@@ -5,6 +5,11 @@ type board struct {
 }
 
 type Square struct {
-	Coordinate string // 座標
+	Coordinate XY     // 座標
 	Type       string // コマの種類
+}
+
+type XY struct {
+	X int
+	Y int
 }
