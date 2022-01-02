@@ -6,8 +6,10 @@
 package tools
 
 import (
+	"fmt"
 	"golangtest/models"
 	"regexp"
+	"sort"
 	"strconv"
 )
 
@@ -117,4 +119,125 @@ func XYToMasu(xy models.XY) string {
 	}
 
 	return string(resultbytes)
+}
+
+func PrintBoard(boards []models.Board) {
+	// 持ち駒の表示のため、無駄なループを回している気がするので後で修正する
+	// TODO: 持ち駒がない場合, 盤面上に駒が無い場合を追加
+
+	// 持ち駒かそれ以外かで処理が変わるので、先にこれらを別の配列に仕分けしてしまう (一瞬しか持たないデータなので少しくらいメモリ食っても良い)
+
+	var MochiKomaTmp []models.Board
+	var KomaTmp []models.Board
+
+	for _, board := range boards {
+
+		if (board.Coordinate.X == 4) || (board.Coordinate.X == 3) { // 持ち駒であれば (E or D)
+			MochiKomaTmp = append(MochiKomaTmp, board)
+		} else { // 盤面上の駒であれば ((E or D) 以外)
+			KomaTmp = append(KomaTmp, board)
+		}
+	}
+
+	// 持ち駒だけでのソート (E, D の順, 1-6 の順)
+	// 先に 1-6 で並べた後、E, D に安定ソートすれば良いかな?
+	count := 0
+	if MochiKomaTmp != nil { // 持ち駒が空でなかった場合にプリント
+		sort.Slice(MochiKomaTmp, func(i, j int) bool {
+			return MochiKomaTmp[i].Coordinate.Y < MochiKomaTmp[j].Coordinate.Y // 1-6 の順番
+		})
+
+		sort.SliceStable(MochiKomaTmp, func(i, j int) bool {
+			return MochiKomaTmp[i].Coordinate.X > MochiKomaTmp[j].Coordinate.X // E(4), D(3) の順番
+		})
+
+		// まず Player2 の持ち駒を表示する (E)
+		fmt.Printf("\n[現在の盤面]\n\nPlayer2の持ち駒:\n")
+		for i, board := range MochiKomaTmp {
+			if board.Coordinate.X == 3 { // D に入ったら break, E が空だった場合も即座にこっちで break するので例外追加は必要なし
+				count = i
+				break
+			}
+
+			fmt.Printf("%s ", TypeToKanji(board.Type))
+
+		}
+		fmt.Printf("\n----------\n")
+	}
+
+	// 通常の盤面部のソート
+
+	sort.Slice(KomaTmp, func(i, j int) bool {
+		return KomaTmp[i].Coordinate.X < KomaTmp[j].Coordinate.X
+	})
+
+	sort.SliceStable(KomaTmp, func(i, j int) bool {
+		return KomaTmp[i].Coordinate.Y < KomaTmp[j].Coordinate.Y
+	})
+
+	// 通常の盤面の表示
+	// fmt.Printf("KomaTmp:\n%v\n", KomaTmp)
+	var xyNow models.XY
+
+	for i := 0; i < 4; i++ { // 行を動かすループ (Y)
+		if i != 0 {
+			fmt.Printf("\n")
+		}
+
+		// fmt.Printf("KomaTmp: %v\n", KomaTmp)
+		for j := 0; j < 3; j++ { // 列を動かすループ (X)
+			xyNow.X = j
+			xyNow.Y = i
+			tmp := KomaTmp[0]
+			if tmp.Coordinate == xyNow {
+				fmt.Printf("%s%s", TypeToKanji(tmp.Type), player2arrow(tmp))
+				KomaTmp = remove(KomaTmp, 0)
+			} else {
+				fmt.Printf("□  ")
+			}
+
+		}
+	}
+
+	// 最後に Player1 の持ち駒を表示する
+	fmt.Printf("\n----------\nPlayer1の持ち駒:\n")
+	if len(MochiKomaTmp) != count {
+		for j := count; j < len(MochiKomaTmp); j++ {
+			fmt.Printf("%s ", TypeToKanji(MochiKomaTmp[j].Type))
+		}
+	}
+	fmt.Printf("\n\n")
+}
+
+func TypeToKanji(komatype string) string {
+	switch komatype {
+	case "l":
+		return "王"
+	case "g":
+		return "飛"
+	case "c":
+		return "歩"
+	case "h":
+		return "と"
+	case "e":
+		return "角"
+	default:
+		return "？"
+	}
+}
+
+// 渡した配列から n 番目の要素を remove した配列を返す関数
+func remove(slice []models.Board, s int) []models.Board {
+	return append(slice[:s], slice[s+1:]...)
+}
+
+// Player 番号を見て print 用の矢印を返す
+func player2arrow(tmp models.Board) string {
+	if tmp.Player == 1 {
+		return "↑"
+	} else if tmp.Player == 2 {
+		return "↓"
+	} else {
+		return "?"
+	}
 }
