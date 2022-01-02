@@ -10,3 +10,8 @@ type XY struct {
 	X int
 	Y int
 }
+
+type Move struct {
+	Src XY
+	Dst XY
+}
