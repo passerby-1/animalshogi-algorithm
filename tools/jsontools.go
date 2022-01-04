@@ -1,3 +1,7 @@
+// UnmarshalJSON()
+// JSONToBoard()
+// komaToPlayerAndType()
+
 package tools
 
 import (

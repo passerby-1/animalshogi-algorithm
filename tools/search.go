@@ -1,3 +1,6 @@
+// PossibleMove()
+// AppendMove()
+
 package tools
 
 import (

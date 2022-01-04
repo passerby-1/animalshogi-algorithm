@@ -1,7 +1,15 @@
+// このファイルに含まれる関数
+// 雑多になっているため要整理
+//
 // Player_num()
 // Ismyturn()
 // MasuToXY()
 // XYToMasu()
+// PrintBoard()
+// TypeToKanji()
+// remove()
+// player2arrow()
+// QueryBoard()
 
 package tools
 
