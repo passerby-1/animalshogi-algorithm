@@ -7,7 +7,7 @@
 // XYToMasu()
 // PrintBoard()
 // TypeToKanji()
-// remove()
+// Remove()
 // player2arrow()
 // QueryBoard()
 
@@ -160,7 +160,7 @@ func PrintBoard(boards []models.Board) {
 		})
 
 		// まず Player2 の持ち駒を表示する (E)
-		fmt.Printf("\n[現在の盤面]\n\nPlayer2の持ち駒:\n")
+		fmt.Printf("\n[現在の盤面]\nPlayer2の持ち駒:\n")
 		for i, board := range MochiKomaTmp {
 			if board.Coordinate.X == 3 { // D に入ったら break, E が空だった場合も即座にこっちで break するので例外追加は必要なし
 				count = i
@@ -199,7 +199,7 @@ func PrintBoard(boards []models.Board) {
 			tmp := KomaTmp[0]
 			if tmp.Coordinate == xyNow {
 				fmt.Printf("%s%s", TypeToKanji(tmp.Type), player2arrow(tmp))
-				KomaTmp = remove(KomaTmp, 0)
+				KomaTmp = Remove(KomaTmp, 0)
 			} else {
 				fmt.Printf("□  ")
 			}
@@ -235,7 +235,7 @@ func TypeToKanji(komatype string) string {
 }
 
 // 渡した配列から n 番目の要素を remove した配列を返す関数
-func remove(slice []models.Board, s int) []models.Board {
+func Remove(slice []models.Board, s int) []models.Board {
 	return append(slice[:s], slice[s+1:]...)
 }
 
