@@ -241,3 +241,20 @@ func player2arrow(tmp models.Board) string {
 		return "?"
 	}
 }
+
+// []models.Board からとある models.XY 座標を持つ models.Board を探してリターンする関数
+// 愚直だが多分仕方がない…(reflect使って汎用性の高いcontains関数を作ると逆に遅いハズ)
+func QueryBoard(boards []models.Board, xy models.XY) (bool, models.Board) {
+	for _, board := range boards {
+		if board.Coordinate == xy {
+			return true, board
+		}
+	}
+
+	var nilBoard models.Board
+	nilBoard.Coordinate = xy
+	nilBoard.Player = -1
+	nilBoard.Type = "not found"
+
+	return false, nilBoard
+}
