@@ -4,6 +4,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"golangtest/socket"
 	"golangtest/tools"
@@ -16,7 +17,14 @@ import (
 func main() {
 
 	fmt.Println("Client start.")
-	s, _ := socket.Connect("localhost:4444")
+
+	flag.Parse()
+	args := flag.Args()
+	address := args[0] + ":" + args[1]
+	s, _ := socket.Connect(address)
+
+	// s, _ := socket.Connect("localhost:4444")
+
 	// s, err := socket.Connect("10.128.219.201:4444")
 
 	/*
@@ -45,22 +53,25 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 	fmt.Printf("Player: %v\n", player)
 	fmt.Printf("recieved msg: %v", message)
 
-	time.Sleep(time.Second * 1)
-
-	// var org_json string = `{"B1":"l2","C1":"e2","B2":"g2","C3":"g1","B4":"l1","C4":"e1","D1":"c1","E1":"c2"}`
+	// var boardjson string
 
 	for {
-
-		// UnmarshaledJson, _ = tools.UnmarshalJSON([]byte(org_json))
 
 		socket.Send(s, "turn")
 		message, _ = socket.Recieve(s)
 		current_turn, _ := tools.Player_num(message)
 
+		// socket.Send(s, "boardjson") // 盤面を取得
+		// boardjson, _ = socket.Recieve(s)
+
 		if current_turn == player { // 自分の番だったら
+
 			socket.Send(s, "boardjson") // 盤面を取得
 			message, _ = socket.Recieve(s)
-			time.Sleep(time.Millisecond * 100)
+
+			fmt.Printf("message after send boardjson: %v", message)
+
+			time.Sleep(time.Second * 3)
 
 			currentBoards := tools.JSONToBoard(message) // []models.Board に変換
 			tools.PrintBoard(currentBoards)
@@ -75,14 +86,17 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 			bestMove, bestScore := tools.MiniMax(&currentBoards, player, 5, 1)
 			moveString := tools.Move2string(bestMove)
 
-			fmt.Printf("bestMove:%v, bestScore:%v, sendmsg: %v", bestMove, bestScore, moveString)
+			fmt.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)
 
 			socket.Send(s, moveString)
+			message, _ = socket.Recieve(s)
+			fmt.Printf("recieved msg:%v", message)
+			time.Sleep(time.Second * 3)
 		}
 		// fmt.Printf("recieved msg: %v", message)
 		// fmt.Printf("Current turn: %v\n", current_turn)
 
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Second * 2)
 	}
 
 	socket.Close(s)
