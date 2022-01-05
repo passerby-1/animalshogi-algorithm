@@ -143,3 +143,36 @@ func staticScoring(pBoards *[]models.Board, playernum int) int {
 
 	}
 }
+
+func MiniMax(pBoards *[]models.Board, playernum int, depth int, reverse int) (models.Move, int) {
+
+	if depth == 0 {
+		return YomiBetterMove(pBoards, playernum)
+	}
+
+	var bestMove models.Move
+	alpha := -1000 * reverse
+
+	nextmoves := PossibleMove(*pBoards, playernum)
+	for _, move := range nextmoves {
+		nextboard := DryrunMove(pBoards, move)
+
+		_, tmp_alpha := MiniMax(nextboard, reversePlayer(playernum), depth-1, reverse*-1)
+
+		if tmp_alpha*reverse > alpha {
+			alpha = tmp_alpha
+			bestMove = move
+		}
+	}
+
+	return bestMove, alpha
+
+}
+
+func reversePlayer(playernum int) int {
+	if playernum == 1 {
+		return 2
+	} else {
+		return 1
+	}
+}

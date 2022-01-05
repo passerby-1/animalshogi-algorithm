@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"fmt"
 	"golangtest/models"
 	"testing"
 )
@@ -41,4 +42,14 @@ func TestPrintBoard(t *testing.T) {
 
 	PrintBoard(testboard)
 
+}
+
+func TestMove2string(t *testing.T) {
+	var move models.Move
+	move.Src.X = 1
+	move.Src.Y = 1
+	move.Dst.X = 2
+	move.Dst.Y = 2
+
+	fmt.Printf("Move:%v\nstring:%v\n", move, Move2string(move))
 }

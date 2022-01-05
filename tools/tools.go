@@ -273,3 +273,9 @@ func QueryBoard(boards []models.Board, xy models.XY) (bool, models.Board) {
 
 	return false, nilBoard
 }
+
+func Move2string(move models.Move) string {
+	var result string
+	result = "mv " + XYToMasu(move.Src) + " " + XYToMasu(move.Dst)
+	return result
+}
