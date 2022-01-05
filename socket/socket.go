@@ -10,6 +10,7 @@ package socket
 
 import (
 	"bufio"
+	"fmt"
 	"net"
 	"time"
 )
@@ -49,4 +50,11 @@ func Recieve(conn net.Conn) (string, error) {
 	}
 
 	return status, nil
+}
+
+func SendRecieve(conn net.Conn, msg string) string {
+	Send(conn, msg)
+	recieved, _ := Recieve(conn)
+	fmt.Printf("recieved msg: %v\n", recieved)
+	return recieved
 }

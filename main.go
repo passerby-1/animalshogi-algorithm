@@ -23,16 +23,6 @@ func main() {
 	address := args[0] + ":" + args[1]
 	s, _ := socket.Connect(address)
 
-	// s, _ := socket.Connect("localhost:4444")
-
-	// s, err := socket.Connect("10.128.219.201:4444")
-
-	/*
-		if err != nil {
-			fmt.Errorf("%s", err)
-		}
-	*/
-
 	go sub(s) // 並列実行
 
 	quit := make(chan os.Signal)
@@ -57,21 +47,13 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 
 	for {
 
-		socket.Send(s, "turn")
-		message, _ = socket.Recieve(s)
+		message := socket.SendRecieve(s, "turn")
 		current_turn, _ := tools.Player_num(message)
-
-		// socket.Send(s, "boardjson") // 盤面を取得
-		// boardjson, _ = socket.Recieve(s)
 
 		if current_turn == player { // 自分の番だったら
 
-			socket.Send(s, "boardjson") // 盤面を取得
-			message, _ = socket.Recieve(s)
-
-			fmt.Printf("message after send boardjson: %v", message)
-
-			time.Sleep(time.Second * 3)
+			message := socket.SendRecieve(s, "boardjson") // 盤面を取得
+			time.Sleep(time.Second * 3)                   // GUI 上でまだ駒が動いているため sleep
 
 			currentBoards := tools.JSONToBoard(message) // []models.Board に変換
 			tools.PrintBoard(currentBoards)
@@ -88,15 +70,13 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 
 			fmt.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)
 
-			socket.Send(s, moveString)
-			message, _ = socket.Recieve(s)
-			fmt.Printf("recieved msg:%v", message)
+			message = socket.SendRecieve(s, moveString)
 			time.Sleep(time.Second * 3)
+
 		}
-		// fmt.Printf("recieved msg: %v", message)
-		// fmt.Printf("Current turn: %v\n", current_turn)
 
 		time.Sleep(time.Second * 2)
+
 	}
 
 	socket.Close(s)

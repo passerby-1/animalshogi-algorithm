@@ -161,8 +161,6 @@ func PrintBoard(boards []models.Board) {
 			return MochiKomaTmp[i].Coordinate.X > MochiKomaTmp[j].Coordinate.X // E(4), D(3) の順番
 		})
 
-		// fmt.Printf("MochiKomaTmp:%v", MochiKomaTmp)
-
 		// まず Player2 の持ち駒を表示する (E)
 		// fmt.Printf("\n[現在の盤面]\nPlayer2の持ち駒:\n")
 		for i, board := range MochiKomaTmp {
@@ -174,7 +172,6 @@ func PrintBoard(boards []models.Board) {
 			fmt.Printf("%s ", TypeToKanji(board.Type))
 
 		}
-		// fmt.Printf("\n----------\n")
 	}
 
 	fmt.Printf("\n----------\n")
@@ -190,7 +187,6 @@ func PrintBoard(boards []models.Board) {
 	})
 
 	// 通常の盤面の表示
-	// fmt.Printf("KomaTmp:\n%v\n", KomaTmp)
 	var xyNow models.XY
 
 	for i := 0; i < 4; i++ { // 行を動かすループ (Y)
@@ -198,7 +194,6 @@ func PrintBoard(boards []models.Board) {
 			fmt.Printf("\n")
 		}
 
-		// fmt.Printf("KomaTmp: %v\n", KomaTmp)
 		for j := 0; j < 3; j++ { // 列を動かすループ (X)
 			xyNow.X = j
 			xyNow.Y = i
