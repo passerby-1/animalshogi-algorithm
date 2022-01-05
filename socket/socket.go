@@ -1,5 +1,10 @@
 // ソケット通信について (receive部分は変更)
 // https://ren.nosuke.me/blog/202006/20200615/
+//
+// Connect()
+// Close()
+// Send()
+// Recieve()
 
 package socket
 

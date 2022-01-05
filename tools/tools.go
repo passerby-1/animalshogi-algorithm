@@ -1,7 +1,15 @@
+// このファイルに含まれる関数
+// 雑多になっているため要整理
+//
 // Player_num()
 // Ismyturn()
 // MasuToXY()
 // XYToMasu()
+// PrintBoard()
+// TypeToKanji()
+// Remove()
+// player2arrow()
+// QueryBoard()
 
 package tools
 
@@ -152,7 +160,7 @@ func PrintBoard(boards []models.Board) {
 		})
 
 		// まず Player2 の持ち駒を表示する (E)
-		fmt.Printf("\n[現在の盤面]\n\nPlayer2の持ち駒:\n")
+		fmt.Printf("\n[現在の盤面]\nPlayer2の持ち駒:\n")
 		for i, board := range MochiKomaTmp {
 			if board.Coordinate.X == 3 { // D に入ったら break, E が空だった場合も即座にこっちで break するので例外追加は必要なし
 				count = i
@@ -188,12 +196,19 @@ func PrintBoard(boards []models.Board) {
 		for j := 0; j < 3; j++ { // 列を動かすループ (X)
 			xyNow.X = j
 			xyNow.Y = i
-			tmp := KomaTmp[0]
-			if tmp.Coordinate == xyNow {
-				fmt.Printf("%s%s", TypeToKanji(tmp.Type), player2arrow(tmp))
-				KomaTmp = remove(KomaTmp, 0)
+			if len(KomaTmp) != 0 { // KomaTmp[0] への nil アクセス防止, KomaTmp != nil では空の構造体の判定ができない
+				// fmt.Printf("KomaTmp is not nil")
+				tmp := KomaTmp[0]
+				if tmp.Coordinate == xyNow {
+					fmt.Printf("%s%s", TypeToKanji(tmp.Type), player2arrow(tmp))
+					KomaTmp = Remove(KomaTmp, 0)
+				} else {
+					fmt.Printf("□  ")
+				}
 			} else {
-				fmt.Printf("□  ")
+				if xyNow.X == 2 && xyNow.Y == 3 {
+					fmt.Printf("□  ")
+				}
 			}
 
 		}
@@ -227,7 +242,7 @@ func TypeToKanji(komatype string) string {
 }
 
 // 渡した配列から n 番目の要素を remove した配列を返す関数
-func remove(slice []models.Board, s int) []models.Board {
+func Remove(slice []models.Board, s int) []models.Board {
 	return append(slice[:s], slice[s+1:]...)
 }
 
@@ -240,4 +255,21 @@ func player2arrow(tmp models.Board) string {
 	} else {
 		return "?"
 	}
+}
+
+// []models.Board からとある models.XY 座標を持つ models.Board を探してリターンする関数
+// 愚直だが多分仕方がない…(reflect使って汎用性の高いcontains関数を作ると逆に遅いハズ)
+func QueryBoard(boards []models.Board, xy models.XY) (bool, models.Board) {
+	for _, board := range boards {
+		if board.Coordinate == xy {
+			return true, board
+		}
+	}
+
+	var nilBoard models.Board
+	nilBoard.Coordinate = xy
+	nilBoard.Player = -1
+	nilBoard.Type = "not found"
+
+	return false, nilBoard
 }
