@@ -4,6 +4,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"golangtest/socket"
 	"golangtest/tools"
@@ -16,7 +17,14 @@ import (
 func main() {
 
 	fmt.Println("Client start.")
-	s, _ := socket.Connect("localhost:4444")
+
+	flag.Parse()
+	args := flag.Args()
+	address := args[0] + ":" + args[1]
+	s, _ := socket.Connect(address)
+
+	// s, _ := socket.Connect("localhost:4444")
+
 	// s, err := socket.Connect("10.128.219.201:4444")
 
 	/*
@@ -47,8 +55,6 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 
 	time.Sleep(time.Second * 1)
 
-	// var org_json string = `{"B1":"l2","C1":"e2","B2":"g2","C3":"g1","B4":"l1","C4":"e1","D1":"c1","E1":"c2"}`
-
 	for {
 
 		// UnmarshaledJson, _ = tools.UnmarshalJSON([]byte(org_json))
@@ -60,7 +66,7 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 		if current_turn == player { // 自分の番だったら
 			socket.Send(s, "boardjson") // 盤面を取得
 			message, _ = socket.Recieve(s)
-			time.Sleep(time.Millisecond * 100)
+			time.Sleep(time.Second * 3)
 
 			currentBoards := tools.JSONToBoard(message) // []models.Board に変換
 			tools.PrintBoard(currentBoards)
@@ -78,11 +84,12 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 			fmt.Printf("bestMove:%v, bestScore:%v, sendmsg: %v", bestMove, bestScore, moveString)
 
 			socket.Send(s, moveString)
+			time.Sleep(time.Second * 3)
 		}
 		// fmt.Printf("recieved msg: %v", message)
 		// fmt.Printf("Current turn: %v\n", current_turn)
 
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Second * 2)
 	}
 
 	socket.Close(s)
