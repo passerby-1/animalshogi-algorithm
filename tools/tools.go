@@ -206,7 +206,7 @@ func PrintBoard(boards []models.Board) {
 					fmt.Printf("□  ")
 				}
 			} else {
-				if xyNow.X == 2 && xyNow.Y == 3 {
+				if xyNow.X == 2 && xyNow.Y == 3 { // 右下の角に駒がなかった場合 KomaTmp の長さが0になり、表示されないのでその例外
 					fmt.Printf("□  ")
 				}
 			}
@@ -272,4 +272,10 @@ func QueryBoard(boards []models.Board, xy models.XY) (bool, models.Board) {
 	nilBoard.Type = "not found"
 
 	return false, nilBoard
+}
+
+func Move2string(move models.Move) string {
+	var result string
+	result = "mv " + XYToMasu(move.Src) + " " + XYToMasu(move.Dst)
+	return result
 }
