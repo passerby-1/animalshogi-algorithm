@@ -55,6 +55,6 @@ func Recieve(conn net.Conn) (string, error) {
 func SendRecieve(conn net.Conn, msg string) string {
 	Send(conn, msg)
 	recieved, _ := Recieve(conn)
-	fmt.Printf("recieved msg: %v\n", recieved)
+	fmt.Printf("recieved msg: %v", recieved)
 	return recieved
 }

@@ -10,6 +10,7 @@
 // Remove()
 // player2arrow()
 // QueryBoard()
+// Move2string()
 
 package tools
 
@@ -53,8 +54,6 @@ func MasuToXY(masu string) models.XY {
 	var result models.XY
 	masubytes := []byte(masu)
 
-	// fmt.Printf("\nmasubytes[0]:%v, masubytes[1]:%v\n", string(masubytes[0]), string(masubytes[1]))
-
 	switch string(masubytes[0]) {
 	case "A":
 		result.X = 0
@@ -86,7 +85,7 @@ func MasuToXY(masu string) models.XY {
 	default:
 		result.Y = -1
 	}
-	// fmt.Printf("Result:%v\n", result)
+
 	return result
 
 }
@@ -130,6 +129,7 @@ func XYToMasu(xy models.XY) string {
 }
 
 func PrintBoard(boards []models.Board) {
+
 	// 持ち駒の表示のため、無駄なループを回している気がするので後で修正する
 	// TODO: 持ち駒がない場合, 盤面上に駒が無い場合を追加
 
@@ -153,6 +153,7 @@ func PrintBoard(boards []models.Board) {
 
 	count := 0
 	if MochiKomaTmp != nil { // 持ち駒が空でなかった場合にプリント
+
 		sort.Slice(MochiKomaTmp, func(i, j int) bool {
 			return MochiKomaTmp[i].Coordinate.Y < MochiKomaTmp[j].Coordinate.Y // 1-6 の順番
 		})
@@ -178,11 +179,11 @@ func PrintBoard(boards []models.Board) {
 
 	// 通常の盤面部のソート
 
-	sort.Slice(KomaTmp, func(i, j int) bool {
+	sort.Slice(KomaTmp, func(i, j int) bool { // X でソート
 		return KomaTmp[i].Coordinate.X < KomaTmp[j].Coordinate.X
 	})
 
-	sort.SliceStable(KomaTmp, func(i, j int) bool {
+	sort.SliceStable(KomaTmp, func(i, j int) bool { // Y でソート, 先の X でのソートの順番を保つため安定ソート
 		return KomaTmp[i].Coordinate.Y < KomaTmp[j].Coordinate.Y
 	})
 
@@ -195,17 +196,23 @@ func PrintBoard(boards []models.Board) {
 		}
 
 		for j := 0; j < 3; j++ { // 列を動かすループ (X)
+
 			xyNow.X = j
 			xyNow.Y = i
+
 			if len(KomaTmp) != 0 { // KomaTmp[0] への nil アクセス防止, KomaTmp != nil では空の構造体の判定ができない
-				// fmt.Printf("KomaTmp is not nil")
-				tmp := KomaTmp[0]
+
+				tmp := KomaTmp[0] // 先頭を取り出し
+
 				if tmp.Coordinate == xyNow {
+
 					fmt.Printf("%s%s", TypeToKanji(tmp.Type), player2arrow(tmp))
-					KomaTmp = Remove(KomaTmp, 0)
+					KomaTmp = Remove(KomaTmp, 0) // 今の先頭(0)を削除, 1番目が次の0番目となる
+
 				} else {
 					fmt.Printf("□  ")
 				}
+
 			} else {
 				if xyNow.X == 2 && xyNow.Y == 3 { // 右下の角に駒がなかった場合 KomaTmp の長さが0になり、表示されないのでその例外
 					fmt.Printf("□  ")
@@ -217,15 +224,19 @@ func PrintBoard(boards []models.Board) {
 
 	// 最後に Player1 の持ち駒を表示する
 	fmt.Printf("\n----------\nPlayer1の持ち駒:\n")
+
 	if len(MochiKomaTmp) != count {
 		for j := count; j < len(MochiKomaTmp); j++ {
 			fmt.Printf("%s ", TypeToKanji(MochiKomaTmp[j].Type))
 		}
 	}
+
 	fmt.Printf("\n\n")
+
 }
 
 func TypeToKanji(komatype string) string {
+
 	switch komatype {
 	case "l":
 		return "王"
@@ -275,6 +286,7 @@ func QueryBoard(boards []models.Board, xy models.XY) (bool, models.Board) {
 	return false, nilBoard
 }
 
+// models.Move からどうぶつしょうぎサーバへ送るコマンド形式への変換
 func Move2string(move models.Move) string {
 	var result string
 	result = "mv " + XYToMasu(move.Src) + " " + XYToMasu(move.Dst)
