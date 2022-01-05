@@ -149,6 +149,8 @@ func PrintBoard(boards []models.Board) {
 
 	// 持ち駒だけでのソート (E, D の順, 1-6 の順)
 	// 先に 1-6 で並べた後、E, D に安定ソートすれば良いかな?
+	fmt.Printf("\n[現在の盤面]\nPlayer2の持ち駒:\n")
+
 	count := 0
 	if MochiKomaTmp != nil { // 持ち駒が空でなかった場合にプリント
 		sort.Slice(MochiKomaTmp, func(i, j int) bool {
@@ -159,8 +161,10 @@ func PrintBoard(boards []models.Board) {
 			return MochiKomaTmp[i].Coordinate.X > MochiKomaTmp[j].Coordinate.X // E(4), D(3) の順番
 		})
 
+		// fmt.Printf("MochiKomaTmp:%v", MochiKomaTmp)
+
 		// まず Player2 の持ち駒を表示する (E)
-		fmt.Printf("\n[現在の盤面]\nPlayer2の持ち駒:\n")
+		// fmt.Printf("\n[現在の盤面]\nPlayer2の持ち駒:\n")
 		for i, board := range MochiKomaTmp {
 			if board.Coordinate.X == 3 { // D に入ったら break, E が空だった場合も即座にこっちで break するので例外追加は必要なし
 				count = i
@@ -170,8 +174,10 @@ func PrintBoard(boards []models.Board) {
 			fmt.Printf("%s ", TypeToKanji(board.Type))
 
 		}
-		fmt.Printf("\n----------\n")
+		// fmt.Printf("\n----------\n")
 	}
+
+	fmt.Printf("\n----------\n")
 
 	// 通常の盤面部のソート
 
