@@ -196,12 +196,19 @@ func PrintBoard(boards []models.Board) {
 		for j := 0; j < 3; j++ { // 列を動かすループ (X)
 			xyNow.X = j
 			xyNow.Y = i
-			tmp := KomaTmp[0]
-			if tmp.Coordinate == xyNow {
-				fmt.Printf("%s%s", TypeToKanji(tmp.Type), player2arrow(tmp))
-				KomaTmp = Remove(KomaTmp, 0)
+			if len(KomaTmp) != 0 { // KomaTmp[0] への nil アクセス防止, KomaTmp != nil では空の構造体の判定ができない
+				// fmt.Printf("KomaTmp is not nil")
+				tmp := KomaTmp[0]
+				if tmp.Coordinate == xyNow {
+					fmt.Printf("%s%s", TypeToKanji(tmp.Type), player2arrow(tmp))
+					KomaTmp = Remove(KomaTmp, 0)
+				} else {
+					fmt.Printf("□  ")
+				}
 			} else {
-				fmt.Printf("□  ")
+				if xyNow.X == 2 && xyNow.Y == 3 {
+					fmt.Printf("□  ")
+				}
 			}
 
 		}

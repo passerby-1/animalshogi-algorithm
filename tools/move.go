@@ -8,19 +8,20 @@ import (
 // func ExecuteMove()
 
 // その手を指したときの盤面状況を返す
-func DryrunMove(Boards []models.Board, move models.Move) []models.Board {
+func DryrunMove(Boards *[]models.Board, move models.Move) *[]models.Board {
 	// TODO: 1. 駒の行き先をquery
 	//       2. Boards からソースを削除、行き先を追加
 	//		 3. queryが存在した場合、それを適切なplayerの持ち駒に追加
 
 	// var newBoards []models.Board
-	newBoards := make([]models.Board, len(Boards))
-	copy(newBoards, Boards)
+	newBoards := make([]models.Board, len(*Boards))
+	copy(newBoards, *Boards)
 
 	dstkomaExists, _ := QueryBoard(newBoards, move.Dst)
 
 	if dstkomaExists { // 宛先に相手の駒があった場合 (自分の持ち駒になる場合)
-		for _, board := range newBoards {
+
+		for i, board := range newBoards {
 			if board.Coordinate == move.Dst {
 				// player1,2 -> D列かE列かの判定, D, E列の一番早い奴を見つけてその次に追加
 				// このときの player は board.Player==move.Dst となる player ではない方 (取る方)
@@ -32,20 +33,23 @@ func DryrunMove(Boards []models.Board, move models.Move) []models.Board {
 					player = 1
 				}
 
-				AppendMochiKoma(&newBoards, player, &board)
+				AppendMochiKoma(&newBoards, player, &newBoards[i])
 
 			}
 		}
 	}
 
 	// 今の駒の座標を、新しい座標に書き換える
-	for _, board := range newBoards {
+	for i, board := range newBoards {
 		if board.Coordinate == move.Src {
-			board.Coordinate = move.Dst
+			newBoards[i].Coordinate = move.Dst
 		}
 	}
 
-	return newBoards
+	// fmt.Printf("INTERNAL:\n")
+	// PrintBoard(newBoards)
+
+	return &newBoards
 
 }
 
