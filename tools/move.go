@@ -86,3 +86,60 @@ func RemoveSpecifiedBoard(slice []models.Board, xy models.XY) []models.Board {
 	return nil
 }
 */
+
+// 一手読み, 勝つ手があればそれを指す
+func Yomi1Move(pBoards *[]models.Board, playernum int) models.Move {
+	var result models.Move
+	nextmoves := PossibleMove(*pBoards, playernum) // 考えられる次の手をリストアップ
+
+	for _, move := range nextmoves {
+		nextboard := DryrunMove(pBoards, move)
+		result = move
+
+		boolwin, winner := IsSettle(nextboard)
+		if boolwin && winner == playernum { // 自分の勝ちだったら
+			break
+		}
+	}
+
+	return result
+
+}
+
+// 一手読み, より良い手を返すようにするための枠組みとなる, 最善手の評価値も返す
+func YomiBetterMove(pBoards *[]models.Board, playernum int) (models.Move, int) {
+	bestScore := -100000
+	var result models.Move
+
+	nextmoves := PossibleMove(*pBoards, playernum)
+	for _, move := range nextmoves {
+		nextboard := DryrunMove(pBoards, move)
+		score := staticScoring(nextboard, playernum)
+
+		if score > bestScore {
+			bestScore = score
+			result = move
+		}
+
+	}
+	return result, bestScore
+
+}
+
+func staticScoring(pBoards *[]models.Board, playernum int) int {
+	boolwin, winner := IsSettle(pBoards)
+	if boolwin && winner == playernum { // 自分の勝ちだったら
+		return 100000 // 勝ちなので最高点
+
+	} else {
+		count := 0
+		for _, board := range *pBoards {
+			if board.Player == playernum {
+				count++
+			}
+		}
+
+		return count * 100
+
+	}
+}
