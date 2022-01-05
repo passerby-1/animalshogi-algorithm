@@ -206,7 +206,7 @@ func PrintBoard(boards []models.Board) {
 					fmt.Printf("□  ")
 				}
 			} else {
-				if xyNow.X == 2 && xyNow.Y == 3 {
+				if xyNow.X == 2 && xyNow.Y == 3 { // 右下の角に駒がなかった場合 KomaTmp の長さが0になり、表示されないのでその例外
 					fmt.Printf("□  ")
 				}
 			}

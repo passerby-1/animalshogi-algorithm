@@ -69,6 +69,10 @@ func AppendMochiKoma(pBoards *[]models.Board, playernum int, koma *models.Board)
 	koma.Coordinate.X = playernum + 2
 	koma.Coordinate.Y = maxY + 1
 
+	if koma.Type == "h" { // ニワトリ (と金) を取ったときひよこ (歩) に戻す
+		koma.Type = "c"
+	}
+
 	// *pBoards = append(*pBoards, newMochiKoma)
 }
 
