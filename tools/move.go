@@ -86,3 +86,10 @@ func RemoveSpecifiedBoard(slice []models.Board, xy models.XY) []models.Board {
 	return nil
 }
 */
+
+// models.Move からどうぶつしょうぎサーバへ送るコマンド形式への変換
+func Move2string(move models.Move) string {
+	var result string
+	result = "mv " + XYToMasu(move.Src) + " " + XYToMasu(move.Dst)
+	return result
+}

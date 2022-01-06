@@ -10,7 +10,6 @@
 // Remove()
 // player2arrow()
 // QueryBoard()
-// Move2string()
 
 package tools
 
@@ -284,11 +283,4 @@ func QueryBoard(boards []models.Board, xy models.XY) (bool, models.Board) {
 	nilBoard.Type = "not found"
 
 	return false, nilBoard
-}
-
-// models.Move からどうぶつしょうぎサーバへ送るコマンド形式への変換
-func Move2string(move models.Move) string {
-	var result string
-	result = "mv " + XYToMasu(move.Src) + " " + XYToMasu(move.Dst)
-	return result
 }
