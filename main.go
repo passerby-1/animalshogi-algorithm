@@ -4,6 +4,8 @@
 package main
 
 import (
+	"animalshogi/json"
+	"animalshogi/search"
 	"animalshogi/socket"
 	"animalshogi/tools"
 	"flag"
@@ -55,7 +57,7 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 			message := socket.SendRecieve(s, "boardjson") // 盤面を取得
 			time.Sleep(time.Second * 3)                   // GUI 上でまだ駒が動いているため sleep
 
-			currentBoards := tools.JSONToBoard(message) // []models.Board に変換
+			currentBoards := json.JSONToBoard(message) // []models.Board に変換
 			tools.PrintBoard(currentBoards)
 
 			boolwin, winner := tools.IsSettle(&currentBoards)
@@ -65,7 +67,7 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 				break
 			}
 
-			bestMove, bestScore := tools.MiniMax(&currentBoards, player, 5, 1)
+			bestMove, bestScore := search.MiniMax(&currentBoards, player, 5, 1)
 			moveString := tools.Move2string(bestMove)
 
 			fmt.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)

@@ -2,10 +2,11 @@
 // JSONToBoard()
 // komaToPlayerAndType()
 
-package tools
+package json
 
 import (
 	"animalshogi/models"
+	"animalshogi/tools"
 	"encoding/json"
 )
 
@@ -31,7 +32,7 @@ func JSONToBoard(json string) []models.Board {
 
 	for zahyo, koma := range UnmarshaledJSON {
 		var tmp models.Board
-		zahyoXY := MasuToXY(zahyo) // マス目からXYに変換
+		zahyoXY := tools.MasuToXY(zahyo) // マス目からXYに変換
 		// fmt.Printf("マス目:%v 座標:%v\n", zahyo, zahyoXY)
 		tmp.Coordinate = zahyoXY // 座標を代入
 

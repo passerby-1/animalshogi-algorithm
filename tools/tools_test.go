@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"animalshogi/json"
 	"animalshogi/models"
 	"fmt"
 	"testing"
@@ -38,7 +39,7 @@ func TestXYToMasu(t *testing.T) {
 
 func TestPrintBoard(t *testing.T) {
 	testjson := `{"B1":"l2","C1":"e2","B2":"g2","C3":"g1","B4":"l1","C4":"e1","D1":"c1","E1":"c2"}` // 8駒分が出ればOK
-	testboard := JSONToBoard(testjson)
+	testboard := json.JSONToBoard(testjson)
 
 	PrintBoard(testboard)
 
