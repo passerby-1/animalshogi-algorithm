@@ -1,8 +1,8 @@
 package socket
 
 import (
+	"animalshogi/tools"
 	"fmt"
-	"golangtest/tools"
 	"testing"
 	"time"
 )
