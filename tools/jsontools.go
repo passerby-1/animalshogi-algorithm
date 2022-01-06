@@ -5,8 +5,8 @@
 package tools
 
 import (
+	"animalshogi/models"
 	"encoding/json"
-	"golangtest/models"
 )
 
 func UnmarshalJSON(data []byte) (map[string]string, error) {

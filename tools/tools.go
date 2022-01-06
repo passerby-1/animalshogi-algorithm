@@ -15,8 +15,8 @@
 package tools
 
 import (
+	"animalshogi/models"
 	"fmt"
-	"golangtest/models"
 	"regexp"
 	"sort"
 	"strconv"

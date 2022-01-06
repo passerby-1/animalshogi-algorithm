@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"golangtest/models"
+	"animalshogi/models"
 )
 
 // 手を指す

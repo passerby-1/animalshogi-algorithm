@@ -4,7 +4,7 @@
 package tools
 
 import (
-	"golangtest/models"
+	"animalshogi/models"
 )
 
 // 考えられるパターンすべてを返す

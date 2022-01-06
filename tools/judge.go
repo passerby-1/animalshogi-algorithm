@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"golangtest/models"
+	"animalshogi/models"
 )
 
 // 決着がついているかを判定する関数

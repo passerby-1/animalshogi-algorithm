@@ -4,10 +4,10 @@
 package main
 
 import (
+	"animalshogi/socket"
+	"animalshogi/tools"
 	"flag"
 	"fmt"
-	"golangtest/socket"
-	"golangtest/tools"
 	"net"
 	"os"
 	"os/signal"

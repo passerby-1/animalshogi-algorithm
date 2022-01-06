@@ -1,8 +1,8 @@
 package tools
 
 import (
+	"animalshogi/models"
 	"fmt"
-	"golangtest/models"
 	"testing"
 )
 
