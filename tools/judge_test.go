@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"animalshogi/json"
+	"animalshogi/jsontools"
 	"fmt"
 	"testing"
 )
@@ -17,7 +17,7 @@ func TestIsSettle(t *testing.T) {
 	// player2 がトライしようとしているが、次で取られるため負けとなる (player1の勝ちとなる) testjson
 	testjson := `{"B4":"l2","A4":"e2","B2":"g2","C3":"g1","C4":"l1","D1":"c1","E1":"c2"}`
 
-	result := json.JSONToBoard(testjson)
+	result := jsontools.JSONToBoard(testjson)
 	PrintBoard(result)
 
 	boolwin, winner := IsSettle(&result)

@@ -4,7 +4,7 @@
 package main
 
 import (
-	"animalshogi/json"
+	"animalshogi/jsontools"
 	"animalshogi/search"
 	"animalshogi/socket"
 	"animalshogi/tools"
@@ -57,7 +57,7 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 			message := socket.SendRecieve(s, "boardjson") // 盤面を取得
 			time.Sleep(time.Second * 3)                   // GUI 上でまだ駒が動いているため sleep
 
-			currentBoards := json.JSONToBoard(message) // []models.Board に変換
+			currentBoards := jsontools.JSONToBoard(message) // []models.Board に変換
 			tools.PrintBoard(currentBoards)
 
 			boolwin, winner := tools.IsSettle(&currentBoards)
