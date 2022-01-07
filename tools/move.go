@@ -49,6 +49,16 @@ func DryrunMove(Boards *[]models.Board, move models.Move) *[]models.Board {
 	for i, board := range newBoards {
 		if board.Coordinate == move.Src {
 			newBoards[i].Coordinate = move.Dst
+
+			// ひよこが成る条件
+			// ・ひよこである
+			// ・player (newBoards[i].Player) が 1 であるとき move.Dst.Y が 0、2 であるときは同 3 である
+
+			if newBoards[i].Type == "c" {
+				if (newBoards[i].Player == 1 && move.Dst.Y == 0) || (newBoards[i].Player == 2 && move.Dst.Y == 3) {
+					newBoards[i].Type = "h"
+				}
+			}
 		}
 	}
 
