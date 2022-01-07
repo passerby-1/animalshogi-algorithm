@@ -3,6 +3,7 @@ package search
 import (
 	"animalshogi/models"
 	"animalshogi/tools"
+	"fmt"
 )
 
 // 一手読み, 勝つ手があればそれを指す
@@ -38,6 +39,7 @@ func YomiBetterMove(pBoards *[]models.Board, playernum int) (models.Move, int) {
 		if score > bestScore {
 			bestScore = score
 			result = move
+			// fmt.Printf("Score:%v\n", bestScore)
 		}
 
 	}
@@ -49,12 +51,16 @@ func YomiBetterMove(pBoards *[]models.Board, playernum int) (models.Move, int) {
 func staticScoring(pBoards *[]models.Board, playernum int) int {
 
 	boolwin, winner := tools.IsSettle(pBoards)
+
 	if boolwin && (winner == playernum) { // 自分の勝ちだったら
 		return 100000 // 勝ちなので最高点
 
 	} else {
 
+		// 仮なので、勝ちではなかった場合 持ち駒の数×100 を返す
+
 		count := 0
+
 		for _, board := range *pBoards {
 			if board.Player == playernum {
 				count++
@@ -66,24 +72,32 @@ func staticScoring(pBoards *[]models.Board, playernum int) int {
 	}
 }
 
-func MiniMax(pBoards *[]models.Board, playernum int, depth int, reverse int) (models.Move, int) {
+func MiniMax(pBoards *[]models.Board, playernum int, depth int, orgDepth int, reverse int) (models.Move, int) {
+
+	var bestMove models.Move
+	var alpha int
 
 	if depth == 0 {
 		return YomiBetterMove(pBoards, playernum)
 	}
 
-	var bestMove models.Move
-	alpha := -1000 * reverse
+	// 評価値の最大値を記録するための変数
+	alpha = -1000 * reverse
 
 	nextmoves := tools.PossibleMove(*pBoards, playernum)
 	for _, move := range nextmoves {
 		nextboard := tools.DryrunMove(pBoards, move)
 
-		_, tmp_alpha := MiniMax(nextboard, reversePlayer(playernum), depth-1, reverse*-1)
+		_, tmp_alpha := MiniMax(nextboard, reversePlayer(playernum), depth-1, orgDepth, reverse*-1)
 
 		if tmp_alpha*reverse > alpha {
 			alpha = tmp_alpha
 			bestMove = move
+			fmt.Printf("current alpha:%v depth:%v\n", alpha, depth)
+		}
+
+		if tmp_alpha == 100000 {
+			break
 		}
 	}
 
