@@ -1,6 +1,7 @@
-package tools
+package jsontools
 
 import (
+	"animalshogi/models"
 	"fmt"
 	"testing"
 )
@@ -49,4 +50,19 @@ func TestJSONToBoard(t *testing.T) {
 	fmt.Printf("\nResult:\n%v", result)
 
 	// test未完成
+}
+
+func TestMasuToXY(t *testing.T) {
+
+	result := MasuToXY("C1")
+
+	var correctResult models.XY
+	correctResult.X = 2
+	correctResult.Y = 0
+
+	if result != correctResult {
+		t.Errorf("Error")
+	}
+
+	t.Logf("Success")
 }

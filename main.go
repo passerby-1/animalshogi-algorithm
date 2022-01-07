@@ -4,10 +4,12 @@
 package main
 
 import (
+	"animalshogi/jsontools"
+	"animalshogi/search"
+	"animalshogi/socket"
+	"animalshogi/tools"
 	"flag"
 	"fmt"
-	"golangtest/socket"
-	"golangtest/tools"
 	"net"
 	"os"
 	"os/signal"
@@ -16,24 +18,19 @@ import (
 
 func main() {
 
+	var (
+		ip    = flag.String("ip", "localhost", "IP address")
+		port  = flag.String("port", "4444", "port number")
+		depth = flag.Int("depth", 5, "search depth")
+	)
+
 	fmt.Println("Client start.")
 
 	flag.Parse()
-	args := flag.Args()
-	address := args[0] + ":" + args[1]
+	address := *ip + ":" + *port
 	s, _ := socket.Connect(address)
 
-	// s, _ := socket.Connect("localhost:4444")
-
-	// s, err := socket.Connect("10.128.219.201:4444")
-
-	/*
-		if err != nil {
-			fmt.Errorf("%s", err)
-		}
-	*/
-
-	go sub(s) // 並列実行
+	go sub(s, *depth) // 並列実行
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
@@ -45,7 +42,7 @@ func main() {
 	os.Exit(0)
 }
 
-func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と並列実行)
+func sub(s net.Conn, depth int) { // goroutine(並列実行, Ctrl+Cキャッチする奴と並列実行)
 
 	message, _ := socket.Recieve(s) // 初回のメッセージ受信
 	player, _ := tools.Player_num(message)
@@ -57,23 +54,15 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 
 	for {
 
-		socket.Send(s, "turn")
-		message, _ = socket.Recieve(s)
+		message := socket.SendRecieve(s, "turn")
 		current_turn, _ := tools.Player_num(message)
-
-		// socket.Send(s, "boardjson") // 盤面を取得
-		// boardjson, _ = socket.Recieve(s)
 
 		if current_turn == player { // 自分の番だったら
 
-			socket.Send(s, "boardjson") // 盤面を取得
-			message, _ = socket.Recieve(s)
+			message := socket.SendRecieve(s, "boardjson") // 盤面を取得
+			time.Sleep(time.Second * 3)                   // GUI 上でまだ駒が動いているため sleep
 
-			fmt.Printf("message after send boardjson: %v", message)
-
-			time.Sleep(time.Second * 3)
-
-			currentBoards := tools.JSONToBoard(message) // []models.Board に変換
+			currentBoards := jsontools.JSONToBoard(message) // []models.Board に変換
 			tools.PrintBoard(currentBoards)
 
 			boolwin, winner := tools.IsSettle(&currentBoards)
@@ -83,20 +72,18 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 				break
 			}
 
-			bestMove, bestScore := tools.MiniMax(&currentBoards, player, 5, 1)
+			bestMove, bestScore := search.MiniMax(&currentBoards, player, depth, depth, 1)
 			moveString := tools.Move2string(bestMove)
 
 			fmt.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)
 
-			socket.Send(s, moveString)
-			message, _ = socket.Recieve(s)
-			fmt.Printf("recieved msg:%v", message)
+			message = socket.SendRecieve(s, moveString)
 			time.Sleep(time.Second * 3)
+
 		}
-		// fmt.Printf("recieved msg: %v", message)
-		// fmt.Printf("Current turn: %v\n", current_turn)
 
 		time.Sleep(time.Second * 2)
+
 	}
 
 	socket.Close(s)

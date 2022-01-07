@@ -2,11 +2,11 @@
 // JSONToBoard()
 // komaToPlayerAndType()
 
-package tools
+package jsontools
 
 import (
+	"animalshogi/models"
 	"encoding/json"
-	"golangtest/models"
 )
 
 func UnmarshalJSON(data []byte) (map[string]string, error) {
@@ -52,4 +52,44 @@ func komaToPlayerAndType(koma string) (int, string) {
 	resultPlayer := int(komabytes[1]) - 48
 
 	return resultPlayer, resultType
+}
+
+func MasuToXY(masu string) models.XY {
+	var result models.XY
+	masubytes := []byte(masu)
+
+	switch string(masubytes[0]) {
+	case "A":
+		result.X = 0
+	case "B":
+		result.X = 1
+	case "C":
+		result.X = 2
+	case "D":
+		result.X = 3 // Player1 の持ち駒
+	case "E":
+		result.X = 4 // Player2 の持ち駒
+	default:
+		result.X = -1
+	}
+
+	switch string(masubytes[1]) {
+	case "1":
+		result.Y = 0
+	case "2":
+		result.Y = 1
+	case "3":
+		result.Y = 2
+	case "4":
+		result.Y = 3
+	case "5":
+		result.Y = 4
+	case "6":
+		result.Y = 5
+	default:
+		result.Y = -1
+	}
+
+	return result
+
 }

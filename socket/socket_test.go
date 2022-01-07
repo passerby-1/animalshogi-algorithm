@@ -1,8 +1,8 @@
 package socket
 
 import (
+	"animalshogi/tools"
 	"fmt"
-	"golangtest/tools"
 	"testing"
 	"time"
 )
@@ -19,26 +19,6 @@ func TestSocket(t *testing.T) {
 	Send(s, "turn")
 	message, _ = Recieve(s)
 	current_turn, _ := tools.Player_num(message)
-	time.Sleep(time.Millisecond * 500)
-	fmt.Printf("current turn:%v\n", current_turn)
-
-	Send(s, "boardjson")
-	message, _ = Recieve(s)
-	fmt.Printf("message after send boardjson: %v", message)
-
-	Send(s, "turn")
-	message, _ = Recieve(s)
-	current_turn, _ = tools.Player_num(message)
-	time.Sleep(time.Millisecond * 500)
-	fmt.Printf("current turn:%v\n", current_turn)
-
-	Send(s, "boardjson")
-	message, _ = Recieve(s)
-	fmt.Printf("message after send boardjson: %v", message)
-
-	Send(s, "turn")
-	message, _ = Recieve(s)
-	current_turn, _ = tools.Player_num(message)
 	time.Sleep(time.Millisecond * 500)
 	fmt.Printf("current turn:%v\n", current_turn)
 
