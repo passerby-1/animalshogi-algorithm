@@ -20,12 +20,17 @@ func main() {
 
 	fmt.Println("Client start.")
 
-	flag.Parse()
-	args := flag.Args()
-	address := args[0] + ":" + args[1]
+	var (
+		ip    = flag.String("ip", "localhost", "IP address")
+		port  = flag.String("port", "4444", "port number")
+		depth = flag.Int("depth", 5, "search depth")
+	)
+
+	ParseTwoDashes()
+	address := *ip + ":" + *port
 	s, _ := socket.Connect(address)
 
-	go sub(s) // 並列実行
+	go sub(s, *depth) // 並列実行
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
@@ -37,7 +42,7 @@ func main() {
 	os.Exit(0)
 }
 
-func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と並列実行)
+func sub(s net.Conn, depth int) { // goroutine(並列実行, Ctrl+Cキャッチする奴と並列実行)
 
 	message, _ := socket.Recieve(s) // 初回のメッセージ受信
 	player, _ := tools.Player_num(message)
@@ -67,7 +72,7 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 				break
 			}
 
-			bestMove, bestScore := search.MiniMax(&currentBoards, player, 5, 1)
+			bestMove, bestScore := search.MiniMax(&currentBoards, player, depth, 1)
 			moveString := tools.Move2string(bestMove)
 
 			fmt.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)
@@ -84,4 +89,16 @@ func sub(s net.Conn) { // goroutine(並列実行, Ctrl+Cキャッチする奴と
 	socket.Close(s)
 	os.Exit(0)
 
+}
+
+// https://matope.hatenablog.com/entry/2014/10/21/120039/
+// ダッシュ1つの引数が気持ち悪かったので… (--flag 形式にしたい)
+func ParseTwoDashes() {
+	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	fs.Usage = flag.Usage
+	flag.CommandLine.VisitAll(func(f *flag.Flag) {
+		fs.Var(f.Value, f.Name, f.Usage)
+		fs.Var(f.Value, "-"+f.Name, f.Usage)
+	})
+	fs.Parse(os.Args[1:])
 }
