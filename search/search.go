@@ -26,6 +26,7 @@ func Yomi1Move(pBoards *[]models.Board, playernum int) models.Move {
 
 // 一手読み, より良い手を返すようにするための枠組みとなる, 最善手の評価値も返す
 func YomiBetterMove(pBoards *[]models.Board, playernum int) (models.Move, int) {
+
 	bestScore := -100000
 	var result models.Move
 
@@ -40,16 +41,19 @@ func YomiBetterMove(pBoards *[]models.Board, playernum int) (models.Move, int) {
 		}
 
 	}
+
 	return result, bestScore
 
 }
 
 func staticScoring(pBoards *[]models.Board, playernum int) int {
+
 	boolwin, winner := tools.IsSettle(pBoards)
-	if boolwin && winner == playernum { // 自分の勝ちだったら
+	if boolwin && (winner == playernum) { // 自分の勝ちだったら
 		return 100000 // 勝ちなので最高点
 
 	} else {
+
 		count := 0
 		for _, board := range *pBoards {
 			if board.Player == playernum {
@@ -82,6 +86,14 @@ func MiniMax(pBoards *[]models.Board, playernum int, depth int, reverse int) (mo
 			bestMove = move
 		}
 	}
+
+	/*
+		fmt.Printf("PLAYER %v (reverse:%v) depth: %v\nbestMove:%v, alpha:%v\nBEFORE:\n", playernum, reverse, depth, bestMove, alpha)
+		tools.PrintBoard(*pBoards)
+		fmt.Printf("AFTER:\n")
+		tools.PrintBoard(*tools.DryrunMove(pBoards, bestMove))
+		fmt.Printf("\n")
+	*/
 
 	return bestMove, alpha
 
