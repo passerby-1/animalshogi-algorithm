@@ -18,15 +18,15 @@ import (
 
 func main() {
 
-	fmt.Println("Client start.")
-
 	var (
 		ip    = flag.String("ip", "localhost", "IP address")
 		port  = flag.String("port", "4444", "port number")
 		depth = flag.Int("depth", 5, "search depth")
 	)
 
-	ParseTwoDashes()
+	fmt.Println("Client start.")
+
+	flag.Parse()
 	address := *ip + ":" + *port
 	s, _ := socket.Connect(address)
 
@@ -89,16 +89,4 @@ func sub(s net.Conn, depth int) { // goroutine(並列実行, Ctrl+Cキャッチ�
 	socket.Close(s)
 	os.Exit(0)
 
-}
-
-// https://matope.hatenablog.com/entry/2014/10/21/120039/
-// ダッシュ1つの引数が気持ち悪かったので… (--flag 形式にしたい)
-func ParseTwoDashes() {
-	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-	fs.Usage = flag.Usage
-	flag.CommandLine.VisitAll(func(f *flag.Flag) {
-		fs.Var(f.Value, f.Name, f.Usage)
-		fs.Var(f.Value, "-"+f.Name, f.Usage)
-	})
-	fs.Parse(os.Args[1:])
 }
