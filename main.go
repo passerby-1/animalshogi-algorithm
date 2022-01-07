@@ -72,7 +72,7 @@ func sub(s net.Conn, depth int) { // goroutine(並列実行, Ctrl+Cキャッチ�
 				break
 			}
 
-			bestMove, bestScore := search.MiniMax(&currentBoards, player, depth, depth, 1)
+			bestMove, bestScore := search.AlphaBetaSearch(&currentBoards, player, depth, -1000, 1000, 1)
 			moveString := tools.Move2string(bestMove)
 
 			fmt.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)
