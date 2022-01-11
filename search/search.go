@@ -3,7 +3,8 @@ package search
 import (
 	"animalshogi/models"
 	"animalshogi/tools"
-	"fmt"
+
+	"github.com/pterm/pterm"
 )
 
 // 一手読み, 勝つ手があればそれを指す
@@ -93,7 +94,7 @@ func MiniMax(pBoards *[]models.Board, playernum int, depth int, orgDepth int, re
 		if tmp_alpha*reverse > alpha {
 			alpha = tmp_alpha
 			bestMove = move
-			fmt.Printf("current alpha:%v depth:%v\n", alpha, depth)
+			pterm.Printf("current alpha:%v depth:%v\n", alpha, depth)
 		}
 
 		if tmp_alpha == 100000 {

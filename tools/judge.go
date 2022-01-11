@@ -5,6 +5,8 @@ import (
 	"animalshogi/socket"
 	"net"
 	"time"
+
+	"github.com/pterm/pterm"
 )
 
 // 決着がついているかを判定する関数
@@ -92,17 +94,25 @@ func isCatch(pBoards *[]models.Board, player int) bool {
 // 並列実行用, turnChan に turn を流す
 func TurnCheck(s net.Conn, turnChan chan int) {
 
+	// TODO: プレイヤーが指し終わった時点でニュートラルな状態にしなければならない
+	// でないと、例えば player2 が指し終わった後、指し手は player1 にならなければいけないが、しばらく turnChan が 2 となるせいで、固まる
+
 	for {
+
 		message := socket.SendRecieve(s, "turn")
-		current_turn, _ := Player_num(message)
-		switch current_turn {
+		currentTurn, _ := Player_num(message)
+
+		switch currentTurn {
 		case 1:
 			turnChan <- 1
+			pterm.Printf("[DEBUG] turnChan has changed to 1\n")
 		case 2:
 			turnChan <- 2
+			pterm.Printf("[DEBUG] turnChan has changed to 2\n")
 		}
 
 		time.Sleep(time.Second)
+		pterm.Printf("Here!\n")
 
 	}
 }
