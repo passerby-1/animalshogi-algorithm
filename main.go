@@ -99,6 +99,7 @@ func sub(s net.Conn, player int, depth int, turnChan chan int, resetChan chan bo
 			if currentTurn == player {
 
 				// resetChan <- true // タイマーリセット
+				// resetChan が何か悪さをしている様子, コメントを外すとデッドロックがどこかに発生する
 
 				message := socket.SendRecieve(s, "boardjson")   // 盤面を取得
 				currentBoards := jsontools.JSONToBoard(message) // []models.Board に変換
