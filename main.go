@@ -32,6 +32,11 @@ func main() {
 
 	go sub(s, *depth) // 並列実行
 
+	// タイマー
+	//	reset := make(chan bool)
+	//	go timer.CountUp(time.Second*60, reset)
+
+	// 終了処理等
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 
