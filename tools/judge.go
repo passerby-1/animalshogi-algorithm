@@ -4,6 +4,7 @@ import (
 	"animalshogi/models"
 	"animalshogi/socket"
 	"net"
+	"time"
 )
 
 // 決着がついているかを判定する関数
@@ -94,12 +95,14 @@ func TurnCheck(s net.Conn, turnChan chan int) {
 	for {
 		message := socket.SendRecieve(s, "turn")
 		current_turn, _ := Player_num(message)
-
 		switch current_turn {
 		case 1:
 			turnChan <- 1
 		case 2:
 			turnChan <- 2
 		}
+
+		time.Sleep(time.Second)
+
 	}
 }
