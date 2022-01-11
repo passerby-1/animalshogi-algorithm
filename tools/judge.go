@@ -98,10 +98,8 @@ func TurnCheck(s net.Conn, turnChan chan int) {
 		switch current_turn {
 		case 1:
 			turnChan <- 1
-			// turnChangeChan <- true
 		case 2:
 			turnChan <- 2
-			// turnChangeChan <- true
 		}
 	}
 }
