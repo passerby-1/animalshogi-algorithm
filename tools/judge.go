@@ -2,6 +2,8 @@ package tools
 
 import (
 	"animalshogi/models"
+	"animalshogi/socket"
+	"net"
 )
 
 // 決着がついているかを判定する関数
@@ -83,5 +85,23 @@ func isCatch(pBoards *[]models.Board, player int) bool {
 
 	default:
 		return false
+	}
+}
+
+// 並列実行用, turnChan に turn を流す
+func TurnCheck(s net.Conn, turnChan chan int) {
+
+	for {
+		message := socket.SendRecieve(s, "turn")
+		current_turn, _ := Player_num(message)
+
+		switch current_turn {
+		case 1:
+			turnChan <- 1
+			// turnChangeChan <- true
+		case 2:
+			turnChan <- 2
+			// turnChangeChan <- true
+		}
 	}
 }

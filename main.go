@@ -7,6 +7,7 @@ import (
 	"animalshogi/jsontools"
 	"animalshogi/search"
 	"animalshogi/socket"
+	"animalshogi/timer"
 	"animalshogi/tools"
 	"flag"
 	"fmt"
@@ -30,11 +31,19 @@ func main() {
 	address := *ip + ":" + *port
 	s, _ := socket.Connect(address)
 
-	go sub(s, *depth) // 並列実行
+	// ターンのチェック
+	turnChan := make(chan int)
+	go tools.TurnCheck(s, turnChan)
+
+	go sub(s, *depth, turnChan) // 並列実行
 
 	// タイマー
-	//	reset := make(chan bool)
-	//	go timer.CountUp(time.Second*60, reset)
+	timeChan := time.NewTimer(time.Second * 59)
+	tickChan := time.NewTimer(time.Second * 1)
+	resetChan := make(chan bool)
+	resetCompreteChan := make(chan bool)
+
+	go timer.Timer(timeChan, tickChan, resetChan, resetCompreteChan)
 
 	// 終了処理等
 	quit := make(chan os.Signal)
@@ -47,7 +56,7 @@ func main() {
 	os.Exit(0)
 }
 
-func sub(s net.Conn, depth int) { // goroutine(並列実行, Ctrl+Cキャッチする奴と並列実行)
+func sub(s net.Conn, depth int, turnChan chan int) { // goroutine(並列実行, Ctrl+Cキャッチする奴と並列実行)
 
 	message, _ := socket.Recieve(s) // 初回のメッセージ受信
 	player, _ := tools.Player_num(message)
@@ -58,40 +67,36 @@ func sub(s net.Conn, depth int) { // goroutine(並列実行, Ctrl+Cキャッチ�
 	// var boardjson string
 
 	for {
+		select {
+		case currentTurn := <-turnChan:
+			if currentTurn == player {
+				message := socket.SendRecieve(s, "boardjson") // 盤面を取得
+				time.Sleep(time.Second * 3)                   // GUI 上でまだ駒が動いているため sleep
 
-		message := socket.SendRecieve(s, "turn")
-		current_turn, _ := tools.Player_num(message)
+				currentBoards := jsontools.JSONToBoard(message) // []models.Board に変換
+				tools.PrintBoard(currentBoards)
 
-		if current_turn == player { // 自分の番だったら
+				boolwin, winner := tools.IsSettle(&currentBoards)
 
-			message := socket.SendRecieve(s, "boardjson") // 盤面を取得
-			time.Sleep(time.Second * 3)                   // GUI 上でまだ駒が動いているため sleep
+				if boolwin {
+					fmt.Printf("[FINISHED] The winner is Player %v", winner)
+					break
+				}
 
-			currentBoards := jsontools.JSONToBoard(message) // []models.Board に変換
-			tools.PrintBoard(currentBoards)
+				bestMove, bestScore := search.AlphaBetaSearch(&currentBoards, player, depth, -1000, 1000, 1)
+				moveString := tools.Move2string(bestMove)
 
-			boolwin, winner := tools.IsSettle(&currentBoards)
+				fmt.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)
 
-			if boolwin {
-				fmt.Printf("[FINISHED] The winner is Player %v", winner)
-				break
+				message = socket.SendRecieve(s, moveString)
+				time.Sleep(time.Second * 3)
+
 			}
 
-			bestMove, bestScore := search.AlphaBetaSearch(&currentBoards, player, depth, -1000, 1000, 1)
-			moveString := tools.Move2string(bestMove)
-
-			fmt.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)
-
-			message = socket.SendRecieve(s, moveString)
-			time.Sleep(time.Second * 3)
+		default:
 
 		}
 
-		time.Sleep(time.Second * 2)
-
 	}
-
-	socket.Close(s)
-	os.Exit(0)
 
 }
