@@ -56,12 +56,13 @@ func main() {
 	go sub(s, player, *depth, turnChan, resetChan, resetCompreteChan)
 	go timer.Timer(timeChan, tickChan, resetChan, resetCompreteChan, turnChan)
 	go tools.TurnCheck(s, turnChan)
+
 	go func() { // リセットが完了する度に、resetChan を false へ戻すため
 		for {
 			select {
 			case <-resetCompreteChan:
 				resetChan <- false
-			default:
+				// default:
 			}
 		}
 	}()
@@ -78,17 +79,6 @@ func main() {
 }
 
 func sub(s net.Conn, player int, depth int, turnChan chan int, resetChan chan bool, resetCompreteChan chan bool) {
-	/*
-		go func() { // リセットが完了する度に、resetChan を false へ戻すため
-			for {
-				select {
-				case <-resetCompreteChan:
-					resetChan <- false
-				default:
-				}
-			}
-		}()
-	*/
 
 	for {
 		select {
@@ -98,7 +88,7 @@ func sub(s net.Conn, player int, depth int, turnChan chan int, resetChan chan bo
 
 			if currentTurn == player {
 
-				// resetChan <- true // タイマーリセット
+				resetChan <- true // タイマーリセット
 				// resetChan が何か悪さをしている様子, コメントを外すとデッドロックがどこかに発生する
 
 				message := socket.SendRecieve(s, "boardjson")   // 盤面を取得
@@ -121,7 +111,7 @@ func sub(s net.Conn, player int, depth int, turnChan chan int, resetChan chan bo
 
 				// time.Sleep(time.Second * 2)
 
-				// resetChan <- true // 自分が打ち終わると共に相手の番になるのでタイマーリセット
+				resetChan <- true // 自分が打ち終わると共に相手の番になるのでタイマーリセット
 			}
 
 		}
