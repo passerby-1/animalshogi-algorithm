@@ -7,13 +7,11 @@ import (
 	"animalshogi/jsontools"
 	"animalshogi/search"
 	"animalshogi/socket"
-	"animalshogi/timer"
 	"animalshogi/tools"
 	"flag"
 	"net"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/pterm/pterm"
 )
@@ -38,8 +36,8 @@ func main() {
 	turnChan := make(chan int)
 
 	// タイマー用
-	timeChan := time.NewTimer(time.Second * 55)
-	tickChan := time.NewTimer(time.Second * 1)
+	// timeChan := time.NewTimer(time.Second * 55)
+	// tickChan := time.NewTimer(time.Second * 1)
 	resetChan := make(chan bool)
 	resetCompreteChan := make(chan bool)
 
@@ -54,18 +52,21 @@ func main() {
 
 	// 並列実行
 	go sub(s, player, *depth, turnChan, resetChan, resetCompreteChan)
-	go timer.Timer(timeChan, tickChan, resetChan, resetCompreteChan, turnChan)
+	// go timer.Timer(timeChan, tickChan, resetChan, resetCompreteChan, turnChan) // 一旦放置
 	go tools.TurnCheck(s, turnChan)
 
+	/* // 一旦修正放置
 	go func() { // リセットが完了する度に、resetChan を false へ戻すため
 		for {
 			select {
 			case <-resetCompreteChan:
+				pterm.Printf("[DEBUG] resetCompreteChan\n")
 				resetChan <- false
 				// default:
 			}
 		}
 	}()
+	*/
 
 	// 終了処理等
 	quit := make(chan os.Signal)
@@ -88,7 +89,7 @@ func sub(s net.Conn, player int, depth int, turnChan chan int, resetChan chan bo
 
 			if currentTurn == player {
 
-				resetChan <- true // タイマーリセット
+				// resetChan <- true // タイマーリセット
 				// resetChan が何か悪さをしている様子, コメントを外すとデッドロックがどこかに発生する
 
 				message := socket.SendRecieve(s, "boardjson")   // 盤面を取得
@@ -111,7 +112,7 @@ func sub(s net.Conn, player int, depth int, turnChan chan int, resetChan chan bo
 
 				// time.Sleep(time.Second * 2)
 
-				resetChan <- true // 自分が打ち終わると共に相手の番になるのでタイマーリセット
+				// resetChan <- true // 自分が打ち終わると共に相手の番になるのでタイマーリセット
 			}
 
 		}

@@ -18,7 +18,7 @@ func AlphaBetaSearch(pBoards *[]models.Board, playernum int, depth int, alpha in
 	for _, move := range nextmoves {
 		nextboard := tools.DryrunMove(pBoards, move)
 
-		_, tmp_alpha := AlphaBetaSearch(nextboard, reversePlayer(playernum), depth-1, beta, alpha, reverse*-1)
+		_, tmp_alpha := AlphaBetaSearch(nextboard, ReversePlayer(playernum), depth-1, beta, alpha, reverse*-1)
 
 		if tmp_alpha*reverse > alpha {
 			alpha = tmp_alpha

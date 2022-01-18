@@ -89,7 +89,7 @@ func MiniMax(pBoards *[]models.Board, playernum int, depth int, orgDepth int, re
 	for _, move := range nextmoves {
 		nextboard := tools.DryrunMove(pBoards, move)
 
-		_, tmp_alpha := MiniMax(nextboard, reversePlayer(playernum), depth-1, orgDepth, reverse*-1)
+		_, tmp_alpha := MiniMax(nextboard, ReversePlayer(playernum), depth-1, orgDepth, reverse*-1)
 
 		if tmp_alpha*reverse > alpha {
 			alpha = tmp_alpha
@@ -114,7 +114,7 @@ func MiniMax(pBoards *[]models.Board, playernum int, depth int, orgDepth int, re
 
 }
 
-func reversePlayer(playernum int) int {
+func ReversePlayer(playernum int) int {
 	if playernum == 1 {
 		return 2
 	} else {

@@ -1,14 +1,14 @@
 package models
 
 type Board struct {
-	Coordinate XY     // 座標
-	Player     int    // プレイヤーの番号
-	Type       string // コマの種類
+	Coordinate XY     `json:"coordinate"` // 座標
+	Player     int    `json:"player"`     // プレイヤーの番号
+	Type       string `json:"type"`       // コマの種類
 }
 
 type XY struct {
-	X int
-	Y int
+	X int `json:"x"`
+	Y int `json:"y"`
 }
 
 type Move struct {

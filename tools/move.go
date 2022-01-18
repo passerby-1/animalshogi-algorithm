@@ -8,6 +8,8 @@ package tools
 
 import (
 	"animalshogi/models"
+
+	"github.com/pterm/pterm"
 )
 
 // 手を指す
@@ -72,25 +74,42 @@ func DryrunMove(Boards *[]models.Board, move models.Move) *[]models.Board {
 
 // 持ち駒を追加する, koma は playernum の player が取った駒についての Board
 func AppendMochiKoma(pBoards *[]models.Board, playernum int, koma *models.Board) {
-	maxY := -1
+
+	count := 0
+
 	for _, board := range *pBoards {
-		if board.Coordinate.X == playernum+2 { // D か E の適切なそれについて
-			if board.Coordinate.Y > maxY {
-				maxY = board.Coordinate.Y
-			}
+		if board.Coordinate.X == playernum+2 {
+			board.Coordinate.Y = count
+			count++
 		}
 	}
+
+	koma.Coordinate.Y = count
+
+	/*
+		sort.Slice(pMochiKomaTmp, func(i, j int) bool { // Y でソート
+			return pMochiKomaTmp[i].Coordinate.Y < pMochiKomaTmp[j].Coordinate.Y
+		})
+	*/
+	/*
+		pterm.Printf("i:%v, pMochiKoma: %v\n", i, *pMochiKoma)
+		if *&pMochiKoma.Coordinate.Y != i { // ソートしたとき順番に穴が空いている -> そこにあった駒が使われた場合
+			koma.Coordinate.Y = i + 1
+			break
+		} else {
+			koma.Coordinate.Y = count
+		}
+	*/
+
 	// これで今の player の持ち駒の数が求まった, これの次のインデックスに追加することになる
 	// 今の相手の駒の、player を自分に書き換え、座標を持ち駒に書き換える
 	koma.Player = playernum
 	koma.Coordinate.X = playernum + 2
-	koma.Coordinate.Y = maxY + 1
 
 	if koma.Type == "h" { // ニワトリ (と金) を取ったときひよこ (歩) に戻す
 		koma.Type = "c"
 	}
-
-	// *pBoards = append(*pBoards, newMochiKoma)
+	pterm.Printf("koma: %v\n", *koma)
 }
 
 /*
@@ -116,7 +135,9 @@ func PossibleMove(Boards []models.Board, playernum int) []models.Move {
 	Moves := *models.SetupMoves()
 	var ReturnMoves []models.Move
 	var xyChecking models.XY
+	// pterm.Printf("Boards: %v\n", Boards)
 	for _, board := range Boards {
+		// pterm.Printf("board.Coordinate%v\n", board.Coordinate)
 		if (board.Player == playernum) && (board.Coordinate.X <= 2) { // 相手の駒と持ち駒を除外
 			xyNow := board.Coordinate
 			komaType := board.Type
@@ -214,6 +235,7 @@ func PossibleMove(Boards []models.Board, playernum int) []models.Move {
 				}
 			}
 		} else if (board.Player == playernum) && (board.Coordinate.X >= 3) { // 自分の持ち駒について
+			// pterm.Printf("持ち駒, board.Coordinate:%v\n", board.Coordinate)
 			// 全てのマスについて駒が置かれているかquery, 無ければ置くことが出来る (二歩等も無いので)
 			for i := 0; i < 4; i++ { // 行を動かすループ (Y)
 				for j := 0; j < 3; j++ { // 列を動かすループ (X)
@@ -238,4 +260,5 @@ func AppendMove(pMoves *[]models.Move, pxyNow *models.XY, pxyChecking *models.XY
 	Move.Dst.X = pxyChecking.X
 	Move.Dst.Y = pxyChecking.Y
 	*pMoves = append(*pMoves, Move)
+	// pterm.Printf("Appended Src:%v, Dst:%v\n", *pxyNow, *pxyChecking)
 }

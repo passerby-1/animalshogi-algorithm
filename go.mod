@@ -6,6 +6,7 @@ require (
 	github.com/atomicgo/cursor v0.0.1 // indirect
 	github.com/gookit/color v1.4.2 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
+	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/pterm/pterm v0.12.33 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect

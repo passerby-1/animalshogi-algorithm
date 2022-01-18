@@ -67,6 +67,7 @@ func Timer(timeChan *time.Timer, tickChan *time.Timer, resetChan chan bool, rese
 			count++
 
 		case <-resetChan:
+			pterm.Printf("[DEBUG] resetChan\n")
 			resetTimer(timeChan, time.Second*55, resetCompreteChan)
 			resetTimer(tickChan, time.Second, resetCompreteChan)
 			p.Stop()
