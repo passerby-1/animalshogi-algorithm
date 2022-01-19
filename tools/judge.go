@@ -112,7 +112,7 @@ func TurnCheck(s net.Conn, turnChan chan int) {
 		}
 
 		time.Sleep(time.Second)
-		pterm.Printf("Here!\n")
+		// pterm.Printf("Here!\n")
 
 	}
 }

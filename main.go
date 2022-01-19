@@ -100,7 +100,19 @@ func sub(s net.Conn, player int, depth int, turnChan chan int, resetChan chan bo
 					break
 				}
 
-				bestMove, bestScore := search.AlphaBetaSearch(&currentBoards, player, depth, -1000, 1000, 1, depth)
+				bestMove, bestScore := search.AlphaBetaSearch(&currentBoards, player, depth, -10000, 10000, 1, depth)
+
+				/*
+					var bestMove models.Move
+					var bestScore int
+
+					if player == 1 {
+						bestMove, bestScore = search.AlphaBetaSearch1(&currentBoards, depth, -50000, 50000, depth)
+					} else {
+						bestMove, bestScore = search.AlphaBetaSearch2(&currentBoards, depth, -50000, 50000, depth)
+					}
+				*/
+
 				moveString := tools.Move2string(bestMove)
 
 				pterm.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)

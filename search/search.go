@@ -75,6 +75,8 @@ func staticScoring(pBoards *[]models.Board, playernum int) int {
 					score = score + 100
 				case "h":
 					score = score + 300
+				default:
+					score = score + 100
 				}
 			}
 		}
