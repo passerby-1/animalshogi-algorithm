@@ -53,8 +53,9 @@ func DryrunMove(Boards *[]models.Board, move models.Move) *[]models.Board {
 			// ひよこが成る条件
 			// ・ひよこである
 			// ・player (newBoards[i].Player) が 1 であるとき move.Dst.Y が 0、2 であるときは同 3 である
+			// ・ただし move.Src で、持ち駒から来ていないことをチェックしなければならない
 
-			if newBoards[i].Type == "c" {
+			if newBoards[i].Type == "c" && move.Src.X <= 2 {
 				if (newBoards[i].Player == 1 && move.Dst.Y == 0) || (newBoards[i].Player == 2 && move.Dst.Y == 3) {
 					newBoards[i].Type = "h"
 				}
@@ -122,7 +123,7 @@ func PossibleMove(Boards []models.Board, playernum int) []models.Move {
 
 			// komaMove := Moves[komaType].([...][]int) とはできない…
 			// また、komaMove が [8][]int かもしれないし [1][]int かもしれない という状態にはできない (同じ処理であっても全てについてその処理を書く必要がある, golangにジェネリスクは無い…)
-			// golang にジェネリスクが無いと思ってたけど増えたんだっけ?
+			// golang にジェネリスクが無いと思ってたけど増えたんだっけ? まだ来てませんでした…
 			// ジェネリスクを使うように書き直す (ただしこれは見た目上の問題)
 			// 外の関数に追い出そうとしても、結局 interface{} で受け取ることになるため、改めて[8][]int か [6][]int か...の判定を外の関数でも行わなければならず、二重となる
 

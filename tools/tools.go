@@ -15,10 +15,11 @@ package tools
 
 import (
 	"animalshogi/models"
-	"fmt"
 	"regexp"
 	"sort"
 	"strconv"
+
+	"github.com/pterm/pterm"
 )
 
 func Player_num(msg string) (int, error) {
@@ -108,7 +109,7 @@ func PrintBoard(boards []models.Board) {
 
 	// 持ち駒だけでのソート (E, D の順, 1-6 の順)
 	// 先に 1-6 で並べた後、E, D に安定ソートすれば良いかな?
-	fmt.Printf("\n[現在の盤面]\nPlayer2の持ち駒:\n")
+	pterm.Printf("\n[現在の盤面]\nPlayer2の持ち駒:\n")
 
 	count := 0
 	if MochiKomaTmp != nil { // 持ち駒が空でなかった場合にプリント
@@ -129,12 +130,12 @@ func PrintBoard(boards []models.Board) {
 				break
 			}
 
-			fmt.Printf("%s ", TypeToKanji(board.Type))
+			pterm.Printf("%s ", TypeToKanji(board.Type))
 
 		}
 	}
 
-	fmt.Printf("\n----------\n")
+	pterm.Printf("\n----------\n")
 
 	// 通常の盤面部のソート
 
@@ -151,7 +152,7 @@ func PrintBoard(boards []models.Board) {
 
 	for i := 0; i < 4; i++ { // 行を動かすループ (Y)
 		if i != 0 {
-			fmt.Printf("\n")
+			pterm.Printf("\n")
 		}
 
 		for j := 0; j < 3; j++ { // 列を動かすループ (X)
@@ -165,16 +166,16 @@ func PrintBoard(boards []models.Board) {
 
 				if tmp.Coordinate == xyNow {
 
-					fmt.Printf("%s%s", TypeToKanji(tmp.Type), player2arrow(tmp))
+					pterm.Printf("%s%s", TypeToKanji(tmp.Type), player2arrow(tmp))
 					KomaTmp = Remove(KomaTmp, 0) // 今の先頭(0)を削除, 1番目が次の0番目となる
 
 				} else {
-					fmt.Printf("□  ")
+					pterm.Printf("□  ")
 				}
 
 			} else {
 				if xyNow.X == 2 && xyNow.Y == 3 { // 右下の角に駒がなかった場合 KomaTmp の長さが0になり、表示されないのでその例外
-					fmt.Printf("□  ")
+					pterm.Printf("□  ")
 				}
 			}
 
@@ -182,15 +183,15 @@ func PrintBoard(boards []models.Board) {
 	}
 
 	// 最後に Player1 の持ち駒を表示する
-	fmt.Printf("\n----------\nPlayer1の持ち駒:\n")
+	pterm.Printf("\n----------\nPlayer1の持ち駒:\n")
 
 	if len(MochiKomaTmp) != count {
 		for j := count; j < len(MochiKomaTmp); j++ {
-			fmt.Printf("%s ", TypeToKanji(MochiKomaTmp[j].Type))
+			pterm.Printf("%s ", TypeToKanji(MochiKomaTmp[j].Type))
 		}
 	}
 
-	fmt.Printf("\n\n")
+	pterm.Printf("\n\n")
 
 }
 

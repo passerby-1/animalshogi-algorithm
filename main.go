@@ -9,84 +9,123 @@ import (
 	"animalshogi/socket"
 	"animalshogi/tools"
 	"flag"
-	"fmt"
 	"net"
 	"os"
 	"os/signal"
-	"time"
+
+	"github.com/pterm/pterm"
 )
 
 func main() {
 
+	pterm.Println("Client start.")
+
+	// 実行時の引数の処理等, ソケット通信接続
+
 	var (
 		ip    = flag.String("ip", "localhost", "IP address")
 		port  = flag.String("port", "4444", "port number")
-		depth = flag.Int("depth", 5, "search depth")
+		depth = flag.Int("depth", 6, "search depth")
 	)
-
-	fmt.Println("Client start.")
 
 	flag.Parse()
 	address := *ip + ":" + *port
 	s, _ := socket.Connect(address)
 
-	go sub(s, *depth) // 並列実行
+	// ターンのチェック用
+	turnChan := make(chan int)
 
+	// タイマー用
+	// timeChan := time.NewTimer(time.Second * 55)
+	// tickChan := time.NewTimer(time.Second * 1)
+	resetChan := make(chan bool)
+	resetCompreteChan := make(chan bool)
+
+	// プレイヤー番号
+	// sub() に入れるとTurnCheckとメッセージを送るタイミングが被るので仮に外に出している
+
+	message, _ := socket.Recieve(s) // 初回のメッセージ受信 (You are PlayerN)
+	player, _ := tools.Player_num(message)
+
+	pterm.Printf("Player: %v\n", player)
+	pterm.Printf("recieved msg: %v", message)
+
+	// 並列実行
+	go sub(s, player, *depth, turnChan, resetChan, resetCompreteChan)
+	// go timer.Timer(timeChan, tickChan, resetChan, resetCompreteChan, turnChan)
+	go tools.TurnCheck(s, turnChan)
+
+	go func() { // リセットが完了する度に、resetChan を false へ戻すため
+		for {
+			select {
+			case <-resetCompreteChan:
+				resetChan <- false
+				// default:
+			}
+		}
+	}()
+
+	// 終了処理等
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 
 	<-quit // ここより下はSIGINTを受けて実行
 
-	fmt.Printf("\nSIGINT Signal received, ending client.\n")
+	pterm.Printf("\nSIGINT Signal received, ending client.\n")
 	socket.Close(s)
 	os.Exit(0)
 }
 
-func sub(s net.Conn, depth int) { // goroutine(並列実行, Ctrl+Cキャッチする奴と並列実行)
-
-	message, _ := socket.Recieve(s) // 初回のメッセージ受信
-	player, _ := tools.Player_num(message)
-
-	fmt.Printf("Player: %v\n", player)
-	fmt.Printf("recieved msg: %v", message)
-
-	// var boardjson string
+func sub(s net.Conn, player int, depth int, turnChan chan int, resetChan chan bool, resetCompreteChan chan bool) {
 
 	for {
+		select {
+		case currentTurn := <-turnChan:
 
-		message := socket.SendRecieve(s, "turn")
-		current_turn, _ := tools.Player_num(message)
+			pterm.Printf("[DEBUG] Current turn: %v\n", currentTurn)
 
-		if current_turn == player { // 自分の番だったら
+			if currentTurn == player {
 
-			message := socket.SendRecieve(s, "boardjson") // 盤面を取得
-			time.Sleep(time.Second * 3)                   // GUI 上でまだ駒が動いているため sleep
+				// resetChan <- true // タイマーリセット
+				// resetChan が何か悪さをしている様子, コメントを外すとデッドロックがどこかに発生する
 
-			currentBoards := jsontools.JSONToBoard(message) // []models.Board に変換
-			tools.PrintBoard(currentBoards)
+				message := socket.SendRecieve(s, "boardjson")   // 盤面を取得
+				currentBoards := jsontools.JSONToBoard(message) // []models.Board に変換
+				tools.PrintBoard(currentBoards)
 
-			boolwin, winner := tools.IsSettle(&currentBoards)
+				boolwin, winner := tools.IsSettle(&currentBoards)
 
-			if boolwin {
-				fmt.Printf("[FINISHED] The winner is Player %v", winner)
-				break
+				if boolwin {
+					pterm.Printf("[FINISHED] The winner is Player %v\n", winner)
+					break
+				}
+
+				bestMove, bestScore := search.AlphaBetaSearch(&currentBoards, player, depth, -10000, 10000, 1, depth)
+
+				/*
+					var bestMove models.Move
+					var bestScore int
+
+					if player == 1 {
+						bestMove, bestScore = search.AlphaBetaSearch1(&currentBoards, depth, -50000, 50000, depth)
+					} else {
+						bestMove, bestScore = search.AlphaBetaSearch2(&currentBoards, depth, -50000, 50000, depth)
+					}
+				*/
+
+				moveString := tools.Move2string(bestMove)
+
+				pterm.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)
+
+				message = socket.SendRecieve(s, moveString) // moved
+
+				// time.Sleep(time.Second * 2)
+
+				// resetChan <- true // 自分が打ち終わると共に相手の番になるのでタイマーリセット
 			}
-
-			bestMove, bestScore := search.AlphaBetaSearch(&currentBoards, player, depth, -1000, 1000, 1)
-			moveString := tools.Move2string(bestMove)
-
-			fmt.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)
-
-			message = socket.SendRecieve(s, moveString)
-			time.Sleep(time.Second * 3)
 
 		}
 
-		time.Sleep(time.Second * 2)
-
 	}
-
-	socket.Close(s)
-	os.Exit(0)
 
 }

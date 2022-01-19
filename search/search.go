@@ -3,7 +3,8 @@ package search
 import (
 	"animalshogi/models"
 	"animalshogi/tools"
-	"fmt"
+
+	"github.com/pterm/pterm"
 )
 
 // 一手読み, 勝つ手があればそれを指す
@@ -53,25 +54,40 @@ func staticScoring(pBoards *[]models.Board, playernum int) int {
 	boolwin, winner := tools.IsSettle(pBoards)
 
 	if boolwin && (winner == playernum) { // 自分の勝ちだったら
-		return 100000 // 勝ちなので最高点
+		return 10000 // 勝ちなので最高点
+		// } else if boolwin && (winner != playernum) {
+		// 	return -12000 // 負けなので最低点
 
 	} else {
 
-		// 仮なので、勝ちではなかった場合 持ち駒の数×100 を返す
-
-		count := 0
+		score := 0
 
 		for _, board := range *pBoards {
 			if board.Player == playernum {
-				count++
+				switch board.Type {
+				case "l":
+					score = score + 1000
+				case "g":
+					score = score + 200
+				case "e":
+					score = score + 250
+				case "c":
+					score = score + 100
+				case "h":
+					score = score + 300
+				default:
+					score = score + 100
+				}
 			}
 		}
 
-		return count * 100
+		pterm.Printf("score:%v\n", score)
+		return score
 
 	}
 }
 
+/*
 func MiniMax(pBoards *[]models.Board, playernum int, depth int, orgDepth int, reverse int) (models.Move, int) {
 
 	var bestMove models.Move
@@ -93,25 +109,26 @@ func MiniMax(pBoards *[]models.Board, playernum int, depth int, orgDepth int, re
 		if tmp_alpha*reverse > alpha {
 			alpha = tmp_alpha
 			bestMove = move
-			fmt.Printf("current alpha:%v depth:%v\n", alpha, depth)
+			pterm.Printf("current alpha:%v depth:%v\n", alpha, depth)
 		}
 
-		if tmp_alpha == 100000 {
+		if tmp_alpha == 10000 {
 			break
 		}
 	}
 
-	/*
-		fmt.Printf("PLAYER %v (reverse:%v) depth: %v\nbestMove:%v, alpha:%v\nBEFORE:\n", playernum, reverse, depth, bestMove, alpha)
-		tools.PrintBoard(*pBoards)
-		fmt.Printf("AFTER:\n")
-		tools.PrintBoard(*tools.DryrunMove(pBoards, bestMove))
-		fmt.Printf("\n")
-	*/
+
+	//	fmt.Printf("PLAYER %v (reverse:%v) depth: %v\nbestMove:%v, alpha:%v\nBEFORE:\n", playernum, reverse, depth, bestMove, alpha)
+	//	tools.PrintBoard(*pBoards)
+	//	fmt.Printf("AFTER:\n")
+	//	tools.PrintBoard(*tools.DryrunMove(pBoards, bestMove))
+	//	fmt.Printf("\n")
+
 
 	return bestMove, alpha
 
 }
+*/
 
 func reversePlayer(playernum int) int {
 	if playernum == 1 {

@@ -11,9 +11,10 @@ package socket
 
 import (
 	"bufio"
-	"fmt"
 	"net"
 	"time"
+
+	"github.com/pterm/pterm"
 )
 
 func Connect(addr string) (net.Conn, error) {
@@ -56,6 +57,6 @@ func Recieve(conn net.Conn) (string, error) {
 func SendRecieve(conn net.Conn, msg string) string {
 	Send(conn, msg)
 	recieved, _ := Recieve(conn)
-	fmt.Printf("recieved msg: %v", recieved)
+	pterm.Printf("recieved msg (send:%v): %v", msg, recieved)
 	return recieved
 }
