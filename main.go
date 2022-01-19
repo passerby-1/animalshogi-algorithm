@@ -7,13 +7,11 @@ import (
 	"animalshogi/jsontools"
 	"animalshogi/search"
 	"animalshogi/socket"
-	"animalshogi/timer"
 	"animalshogi/tools"
 	"flag"
 	"net"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/pterm/pterm"
 )
@@ -27,7 +25,7 @@ func main() {
 	var (
 		ip    = flag.String("ip", "localhost", "IP address")
 		port  = flag.String("port", "4444", "port number")
-		depth = flag.Int("depth", 5, "search depth")
+		depth = flag.Int("depth", 6, "search depth")
 	)
 
 	flag.Parse()
@@ -38,8 +36,8 @@ func main() {
 	turnChan := make(chan int)
 
 	// タイマー用
-	timeChan := time.NewTimer(time.Second * 55)
-	tickChan := time.NewTimer(time.Second * 1)
+	// timeChan := time.NewTimer(time.Second * 55)
+	// tickChan := time.NewTimer(time.Second * 1)
 	resetChan := make(chan bool)
 	resetCompreteChan := make(chan bool)
 
@@ -54,7 +52,7 @@ func main() {
 
 	// 並列実行
 	go sub(s, player, *depth, turnChan, resetChan, resetCompreteChan)
-	go timer.Timer(timeChan, tickChan, resetChan, resetCompreteChan, turnChan)
+	// go timer.Timer(timeChan, tickChan, resetChan, resetCompreteChan, turnChan)
 	go tools.TurnCheck(s, turnChan)
 
 	go func() { // リセットが完了する度に、resetChan を false へ戻すため
@@ -88,7 +86,7 @@ func sub(s net.Conn, player int, depth int, turnChan chan int, resetChan chan bo
 
 			if currentTurn == player {
 
-				resetChan <- true // タイマーリセット
+				// resetChan <- true // タイマーリセット
 				// resetChan が何か悪さをしている様子, コメントを外すとデッドロックがどこかに発生する
 
 				message := socket.SendRecieve(s, "boardjson")   // 盤面を取得
@@ -102,7 +100,7 @@ func sub(s net.Conn, player int, depth int, turnChan chan int, resetChan chan bo
 					break
 				}
 
-				bestMove, bestScore := search.AlphaBetaSearch(&currentBoards, player, depth, -1000, 1000, 1)
+				bestMove, bestScore := search.AlphaBetaSearch(&currentBoards, player, depth, -1000, 1000, 1, depth)
 				moveString := tools.Move2string(bestMove)
 
 				pterm.Printf("bestMove:%v, bestScore:%v, sendmsg: %v\n", bestMove, bestScore, moveString)
@@ -111,7 +109,7 @@ func sub(s net.Conn, player int, depth int, turnChan chan int, resetChan chan bo
 
 				// time.Sleep(time.Second * 2)
 
-				resetChan <- true // 自分が打ち終わると共に相手の番になるのでタイマーリセット
+				// resetChan <- true // 自分が打ち終わると共に相手の番になるのでタイマーリセット
 			}
 
 		}
